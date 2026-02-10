@@ -1,26 +1,11 @@
-name: Hidden Power Bot
+- name: Download cloudflared
 
-on:
-  workflow_dispatch:
-  schedule:
-    - cron: "*/30 * * * *"   # every 30 minutes
+- name: Download cloudflared2
+run: |
+          wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+          chmod +x cloudflared-linux-amd64
+          sudo mv cloudflared-linux-amd64 /usr/local/bin/cloudflared
 
-jobs:
-  run-script:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run script
-        run: node index.js
-      
+      - name: Start tunnel
+        run: |
+          cloudflared tunnel --url http://localhost:3000
