@@ -1,25 +1,32 @@
-name: Hidden Power Bot 2
+name: Cloudflared Port Forward 3
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "*/30 * * * *"   # every 30 minutes
 
 jobs:
-  run-script:
+  tunnel:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 18
 
-      - name: Install dependencies
-        run: npm install
+      - name: Start server
+        run: |
+          node server.js &
+          sleep 3
 
-      - name: Run script
-        run: node server.js
+      - name: Download cloudflared
+        run: |
+          wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+          chmod +x cloudflared-linux-amd64
+          sudo mv cloudflared-linux-amd64 /usr/local/bin/cloudflared
+
+      - name: Start tunnel
+        run: |
+          cloudflared tunnel --url http://localhost:3000
