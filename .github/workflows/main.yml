@@ -1,18 +1,17 @@
-name: Cloudflared Port Forward 3
+name: Cloudflared Test 4
 
 on:
   workflow_dispatch:
 
 jobs:
-  tunnel:
+  test:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 18
 
@@ -21,7 +20,7 @@ jobs:
           node server.js &
           sleep 3
 
-      - name: Download cloudflared
+      - name: Install cloudflared
         run: |
           wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
           chmod +x cloudflared-linux-amd64
@@ -29,4 +28,8 @@ jobs:
 
       - name: Start tunnel
         run: |
-          cloudflared tunnel --url http://localhost:3000
+          cloudflared tunnel --url http://localhost:4040 &
+          sleep 10
+
+      - name: Keep job alive
+        run: sleep 600
