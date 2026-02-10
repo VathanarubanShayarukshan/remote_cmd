@@ -1,0 +1,53 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Command Runner</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    input { width: 300px; padding: 8px; }
+    button { padding: 8px 12px; margin-left: 8px; }
+    pre { background: #f0f0f0; padding: 15px; margin-top: 20px; white-space: pre-wrap; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <h1>Run Shell Command</h1>
+  <input type="text" id="command" placeholder="Enter command" />
+  <button onclick="runCommand()">Run</button>
+
+  <pre id="output"></pre>
+
+  <script>
+    async function runCommand() {
+const command = document.getElementById('command').value.trim();
+      const outputEl = document.getElementById('output');
+
+      if (!command) {
+        alert('Please enter a command');
+        return;
+      }
+
+      outputEl.textContent = 'Running...';
+
+      try {
+        const response = await fetch('/run-command', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ command }),
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+          outputEl.textContent = `Error: ${data.error}\n${data.stderr || ''}`;
+        } else {
+          outputEl.textContent = data.output || '(No output)';
+        }
+      } catch (err) {
+        outputEl.textContent = `Request failed: ${err.message}`;
+      }
+    }
+  </script>
+</body>
+</html>
