@@ -1,4 +1,4 @@
-name: Hidden Power Bot
+name: Hidden Power Bot 2
 
 on:
   workflow_dispatch:
