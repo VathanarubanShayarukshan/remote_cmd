@@ -1,4 +1,4 @@
-name: Tunnel Server 3
+name: Tunnel Server 4
 
 on:
   workflow_dispatch:
