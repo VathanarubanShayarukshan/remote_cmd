@@ -1,19 +1,17 @@
-name: Server + Cloudflared Tunnel
+name: Tunnel Server
 
 on:
   workflow_dispatch:
 
 jobs:
-  run-server:
+  run:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 30
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 18
 
@@ -21,8 +19,8 @@ jobs:
         run: |
           nohup node server.js > server.log 2>&1 &
           sleep 5
-          echo "Testing local server..."
-          curl http://localhost:4040
+          echo "Testing local server"
+          curl http://127.0.0.1:4040
 
       - name: Install Cloudflared
         run: |
@@ -30,6 +28,6 @@ jobs:
           chmod +x cloudflared-linux-amd64
           sudo mv cloudflared-linux-amd64 /usr/local/bin/cloudflared
 
-      - name: Start Cloudflare Tunnel
+      - name: Start Tunnel
         run: |
-          cloudflared tunnel --url http://localhost:4040 --loglevel info
+          cloudflared tunnel --url http://127.0.0.1:4040 --no-autoupdate
