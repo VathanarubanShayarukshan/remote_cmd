@@ -28,6 +28,14 @@ jobs:
           chmod +x cloudflared-linux-amd64
           sudo mv cloudflared-linux-amd64 /usr/local/bin/cloudflared
 
-      - name: Start Tunnel
+      - name: Test server
         run: |
-          cloudflared tunnel --url http://127.0.0.1:4040 --no-autoupdate
+         nohup node server.js &
+         sleep 5
+         curl http://127.0.0.1:4040
+    
+      - name: Start Tunnel (Debug Mode)
+        run: |
+          cloudflared tunnel --url http://127.0.0.1:4040 --loglevel debug
+
+
