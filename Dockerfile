@@ -6,7 +6,6 @@ RUN apt update && apt install -y \
     ttyd \
     bash \
     curl \
-    git \
     openssh-client \
     && rm -rf /var/lib/apt/lists/*
 
