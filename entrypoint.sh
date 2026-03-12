@@ -18,13 +18,13 @@ chmod 600 /root/.ssh/id_ed25519
 ssh-keyscan github.com >> /root/.ssh/known_hosts
 
 # 2. Git அமைப்புகள் (உங்கள் பெயர் மற்றும் மின்னஞ்சலை இங்கே மாற்றவும்)
-git config --global user.email "shyarukshan@example.com"
-git config --global user.name "Shyarukshan"
+git config --global user.email "shairu2012@gamil.com"
+git config --global user.name "VathanarubanShayarukshan"
 git config --global --add safe.directory /home
 
 # 3. SSH URL மூலம் Repo-வை இணைத்தல்
 # முக்கியம்: 'your-username/your-repo' என்பதை உங்கள் GitHub URL-க்கு ஏற்ப மாற்றவும்
-GIT_REPO="git@github.com:your-username/your-repo.git"
+GIT_REPO="https://github.com/VathanarubanShayarukshan/data.git"
 
 if [ ! -d ".git" ]; then
     echo "Cloning repository..."
