@@ -5,17 +5,14 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update && apt install -y \
     ttyd \
     bash \
-    curl \
     openssh-client \
     && rm -rf /var/lib/apt/lists/*
 
 # வேலை செய்யும் கோப்புறை
 WORKDIR /home
 
-# ஸ்கிரிப்டை உள்ளே நகர்த்துதல்
-COPY entrypoint.sh /home/entrypoint.sh
-RUN chmod +x /home/entrypoint.sh
-
+#ping script
+RUN ping remote-cmd.onrender.com
 # Port-ஐத் திறத்தல்
 EXPOSE 7860
 
