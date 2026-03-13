@@ -1,6 +1,6 @@
 FROM ubuntu:22.04
 
-# 1. தேவையான அனைத்தையும் ஒரே RUN கட்டளையில் நிறுவுதல்
+# 1. தேவையான மென்பொருட்களை நிறுவுதல்
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
     ttyd \
@@ -12,8 +12,11 @@ RUN apt-get update && apt-get install -y \
 # 2. வேலை செய்யும் கோப்புறை
 WORKDIR /home
 
-# 3. Port-ஐத் திறத்தல்
+# 3. Port-ஐத் திறத்தல் (Render போன்ற தளங்களுக்குத் தேவை)
 EXPOSE 7860
 
-# Background-ல் ping ஓடவிட்டு, பிரதான ஸ்கிரிப்டை இயக்குதல்
-CMD sh -c "while true; do ping -c 1 remote-cmd.onrender.com; sleep 120; done
+# 4. நேரடியாக Ping மற்றும் ttyd-ஐ இயக்குதல்
+# இங்கே 'ttyd' உங்கள் மெயின் பிராசஸாக இருக்கும். 
+# பின்னணியில் (Background) ping ஓடிக்கொண்டே இருக்கும்.
+CMD sh -c "while true; do ping -c 1 remote-cmd.onrender.com; sleep 120; done & ttyd -p 7860 bash"
+
