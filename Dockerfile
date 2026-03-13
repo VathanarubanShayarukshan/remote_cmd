@@ -1,24 +1,19 @@
 FROM ubuntu:22.04
 
-# மென்பொருட்களை நிறுவுதல்
+# 1. தேவையான அனைத்தையும் ஒரே RUN கட்டளையில் நிறுவுதல்
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt update && apt install -y \
+RUN apt-get update && apt-get install -y \
     ttyd \
     bash \
     openssh-client \
+    iputils-ping \
     && rm -rf /var/lib/apt/lists/*
 
-# வேலை செய்யும் கோப்புறை
+# 2. வேலை செய்யும் கோப்புறை
 WORKDIR /home
 
-#ping script install 
-RUN apt-get install -y iputils-ping
-
-#ping
-CMD while true; do ping -c 1 remote-cmd.onrender.com; sleep 120; done
-
-# Port-ஐத் திறத்தல்
+# 3. Port-ஐத் திறத்தல்
 EXPOSE 7860
 
-# ஸ்கிரிப்டை இயக்குதல்
-CMD ["./entrypoint.sh"]
+# Background-ல் ping ஓடவிட்டு, பிரதான ஸ்கிரிப்டை இயக்குதல்
+CMD sh -c "while true; do ping -c 1 remote-cmd.onrender.com; sleep 120; done & ./entrypoint.sh"
