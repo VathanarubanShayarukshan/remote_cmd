@@ -16,4 +16,4 @@ WORKDIR /home
 EXPOSE 7860
 
 # Background-ல் ping ஓடவிட்டு, பிரதான ஸ்கிரிப்டை இயக்குதல்
-CMD sh -c "while true; do ping -c 1 remote-cmd.onrender.com; sleep 120; done & ./entrypoint.sh"
+CMD sh -c "while true; do ping -c 1 remote-cmd.onrender.com; sleep 120; done
