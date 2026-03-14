@@ -1,38 +1,28 @@
-const express = require('express');
-const { exec } = require('child_process');
-const path = require('path');
+const express = require("express");
+const { exec } = require("child_process");
 
 const app = express();
 app.use(express.json());
+app.use(express.static("public")); // Serve HTML/JS
 
-// Serve static HTML files from "public" folder
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.post('/run-command', (req, res) => {
+// API endpoint to execute command
+app.post("/run", (req, res) => {
   const { command } = req.body;
 
-  if (!command) {
-    return res.status(400).json({ error: 'No command provided' });
+  // ⚠️ Dangerous! Only use in safe/test environments
+  if (!command) return res.status(400).json({ error: "No command provided" });
+
+  // Optional: whitelist commands
+  const allowed = ["ls", "pwd", "whoami", "date"];
+  const cmdName = command.split(" ")[0];
+  if (!allowed.includes(cmdName)) {
+    return res.status(403).json({ error: "Command not allowed" });
   }
 
-  exec(command, (error, stdout, stderr) => {
-
-    if (error) {
-      // Convert \n to real line breaks in error output
-      const errOutput = error.message.replace();
-      return res.json({ error: errOutput });
-    }
-
-    let output = stdout || stderr;
-
-    // ✅ MAIN FIX: Convert "\n" text into actual new line
-    output = output.replace( );
-
-    res.json({ output: output });
+  exec(command, (err, stdout, stderr) => {
+    if (err) return res.json({ error: stderr || err.message });
+    res.json({ output: stdout });
   });
 });
 
-const PORT = 4040;
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-});
+app.listen(3000, () => console.log("Server running on http://localhost:3000"));
