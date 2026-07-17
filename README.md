@@ -14,8 +14,6 @@
 
 ### 🔹 Step 1: Download Setup Script
 ```bash
-mkdir remote_cmd
-cd remote_cmd
 curl -O https://raw.githubusercontent.com/VathanarubanShayarukshan/remote_cmd/refs/heads/main/setup.sh
 chmod +x setup.sh
 ./setup.sh
