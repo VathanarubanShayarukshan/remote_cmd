@@ -112,7 +112,7 @@ fi
 # 8️⃣ Start Cloudflare Tunnel
 echo -e "${YELLOW}☁️ Starting Cloudflare Quick Tunnel...${NC}"
 nohup cloudflared tunnel --url http://localhost:1212 < /dev/null > tunnel.log 2>&1 & disown
-sleep 5
+sleep 10
 
 # 9️⃣ Extract & Show URL
 TUNNEL_URL=$(grep -oE 'https://[^ ]+\.(cfargotunnel|trycloudflare)\.com' tunnel.log 2>/dev/null | head -1)
