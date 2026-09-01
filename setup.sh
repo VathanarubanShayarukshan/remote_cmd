@@ -71,7 +71,7 @@ fi
 
 # 3️⃣ Setup Directory
 echo -e "${YELLOW}📁 Setting up project directory...${NC}"
-mkdir -p ~/web && cd ~/web
+mkdir web && cd web
 
 # 4️⃣ Download Server Code
 echo -e "${YELLOW}📥 Downloading latest server.js...${NC}"
