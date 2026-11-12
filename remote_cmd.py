@@ -7,6 +7,7 @@ Python standard library only. Run behind cloudflared:
 """
 import json
 import os
+import re
 import secrets
 import shutil
 import signal
@@ -26,6 +27,9 @@ RUNTIME = BASE_DIR / '.runtime'
 IS_WIN = os.name == 'nt'
 OUTPUT_CAP = 2 * 1024 * 1024
 CWD_MARKER = '___CWD___'
+# Harmless bash warnings emitted when a shell starts in a deleted directory.
+# The server recovers automatically; hide these lines from the web UI.
+NOISE_RE = re.compile(r'^[^\n]*error retrieving current directory[^\n]*\n?', re.MULTILINE)
 
 RUNTIME.mkdir(parents=True, exist_ok=True)
 
@@ -451,7 +455,8 @@ class Handler(BaseHTTPRequestHandler):
 
         if p == '/api/read':
             with LOCK:
-                payload = {'output': STATE['output'], 'cwd': STATE['cwd'], 'isRunning': STATE['running']}
+                output, cwd, running = STATE['output'], STATE['cwd'], STATE['running']
+            payload = {'output': NOISE_RE.sub('', output), 'cwd': cwd, 'isRunning': running}
             self._send(200, json.dumps(payload))
             return
 
