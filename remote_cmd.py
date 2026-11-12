@@ -110,6 +110,16 @@ def _execute(command):
         STATE['running'] = True
     _kill_tree(old)
 
+    # The persistent cwd may have been deleted/renamed since the last command.
+    # Spawning a shell into a dead directory causes bash "getcwd" errors, so
+    # fall back to home and remember the recovery.
+    if not Path(cwd).is_dir():
+        home = str(Path.home())
+        _append_output(f'[Previous directory no longer exists; reset to {home}]\n')
+        cwd = home
+        with LOCK:
+            STATE['cwd'] = home
+
     creationflags = 0x00000200 if IS_WIN else 0
     try:
         proc = subprocess.Popen(
