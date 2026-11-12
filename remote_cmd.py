@@ -71,6 +71,18 @@ def _shell_argv(command):
     return [bash, '-c', command]
 
 
+def _ensure_server_cwd():
+    # If the launch directory was deleted/renamed, the process cwd is a dead
+    # inode that child shells inherit -> bash "getcwd" errors. Move to home.
+    try:
+        os.getcwd()
+    except OSError:
+        try:
+            os.chdir(str(Path.home()))
+        except OSError:
+            os.chdir('/')
+
+
 def _wrap_command(command, cwd):
     if IS_WIN:
         return f'cd /d "{cwd}" && {command} & echo {CWD_MARKER} & cd'
@@ -121,6 +133,7 @@ def _execute(command):
             STATE['cwd'] = home
 
     creationflags = 0x00000200 if IS_WIN else 0
+    _ensure_server_cwd()
     try:
         proc = subprocess.Popen(
             _shell_argv(_wrap_command(command, cwd)), cwd=cwd,
@@ -524,6 +537,7 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main():
+    _ensure_server_cwd()
     server = ThreadingHTTPServer((HOST, PORT), Handler)
     server.daemon_threads = True
     print(f'[{time.strftime("%H:%M:%S")}] VPS Web Terminal (Python) listening on http://{HOST}:{PORT}', flush=True)

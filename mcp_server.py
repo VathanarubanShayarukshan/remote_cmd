@@ -106,13 +106,35 @@ def _shell_argv(command):
     return [bash, '-c', command]
 
 
+def _ensure_server_cwd():
+    # If the directory this server was launched from was deleted/renamed, the
+    # process cwd is a dead inode and every child shell inherits it, causing
+    # bash "getcwd: cannot access parent directories". Move to a stable dir.
+    try:
+        os.getcwd()
+    except OSError:
+        try:
+            os.chdir(str(Path.home()))
+        except OSError:
+            os.chdir('/')
+
+
+def _usable_dir(requested):
+    try:
+        if requested and Path(requested).is_dir():
+            return str(Path(requested).resolve())
+    except OSError:
+        pass
+    return str(Path.home())
+
+
 # ------------------------------ tool implementations ------------------------------
 
 def run_command(args):
     command = str(args.get('command') or '')
     if not command.strip():
         raise ValueError('command is required')
-    workdir = os.path.abspath(str(args['cwd'])) if args.get('cwd') else str(Path.home())
+    workdir = _usable_dir(os.path.abspath(str(args['cwd'])) if args.get('cwd') else None)
     try:
         timeout_ms = int(args.get('timeout_ms') or 120000)
     except (TypeError, ValueError):
@@ -122,6 +144,7 @@ def run_command(args):
     result = {'exit_code': -1, 'stdout': '', 'stderr': '', 'cwd': workdir,
               'timed_out': False, 'truncated': False}
     creationflags = 0x00000200 if IS_WIN else 0  # CREATE_NEW_PROCESS_GROUP
+    _ensure_server_cwd()
     try:
         proc = subprocess.Popen(
             _shell_argv(command), cwd=workdir, env=os.environ.copy(),
@@ -296,11 +319,16 @@ def system_info(_args):
         user = getpass.getuser()
     except Exception:
         user = 'unknown'
+    _ensure_server_cwd()
+    try:
+        server_cwd = os.getcwd()
+    except OSError:
+        server_cwd = str(Path.home())
     return {'platform': sys.platform, 'arch': platform.machine(),
             'hostname': platform.node(), 'user': user,
             'home': str(Path.home()), 'default_cwd': str(Path.home()),
             'python_version': platform.python_version(),
-            'uptime_seconds': _uptime_seconds(), 'server_cwd': os.getcwd()}
+            'uptime_seconds': _uptime_seconds(), 'server_cwd': server_cwd}
 
 
 # ------------------------------ tool definitions ------------------------------
@@ -576,6 +604,7 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main():
+    _ensure_server_cwd()
     server = ThreadingHTTPServer((HOST, PORT), Handler)
     server.daemon_threads = True
     print(f'[{datetime.now().isoformat(timespec="seconds")}] Remote-Shell MCP (Python) listening on http://{HOST}:{PORT}', flush=True)
