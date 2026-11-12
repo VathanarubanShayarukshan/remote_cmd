@@ -1,0 +1,13 @@
+# Runtime secrets, logs, and connection info (never commit the token)
+.runtime/
+
+# Locally downloaded cloudflared binary
+bin/
+
+# Python
+__pycache__/
+*.pyc
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
